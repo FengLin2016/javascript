@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>贪吃蛇游戏</title>
+</head>
+<style>
+	*{margin:0;padding: 0;}
+	table td{width: 50px; height: 50px;}
+	table td.header{background: red;}
+	table td.food{background: green;}
+	table td.snake{background: black;}
+</style>
+<body>
+</body>
+<script>
+	//全局变量
+	var pos=[];//存snake身体坐标
+	//生成表格
+	function creatTable(){
+		var h='';
+		for(var i=0;i<10;i++){
+			h+='<tr>'
+			for(var j=0;j<10;j++){
+				h+='<td></td>'
+			}
+			h+='</tr>'
+		}
+		document.getElementsByTagName('body')[0].innerHTML='<table border="1" cellspacing="0" cellpadding="0">'+h+'</table>';
+	}
+
+	//生成食物/身体
+	//@param type[0/食物;1/头]
+	function creatSnake(type){
+		var x   = parseInt(Math.random()*10);
+		var y   = parseInt(Math.random()*10);
+		var obj = document.getElementsByTagName('table')[0];
+		if(!obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className){
+			if(type){
+				obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+				pos.push([x,y]);
+			}else{
+				obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='food';
+			}
+		}else{
+			creatSnake(type);
+		}
+	}
+	
+	
+	//移动snake身体
+	//每个方向的代码很类似，可以归纳下
+	//@param direction[0上 1右 2下 3左]
+	function moveSnake(direction){
+		var obj = document.getElementsByTagName('table')[0];
+		for(x=0;x<obj.getElementsByTagName("tr").length;x++){
+			for(y=0;y<obj.getElementsByTagName("tr")[0].getElementsByTagName("td").length;y++){
+				if(obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className=='header'){
+					if(direction==0){
+						obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='';
+						if(x>=1){
+							if(obj.getElementsByTagName("tr")[x-1].getElementsByTagName("td")[y].className=='food'){
+							pos.unshift([x,y]);//如果是食物，则向开头加个坐标
+							creatSnake(0);//再次创建食物
+							}else if(obj.getElementsByTagName("tr")[x-1].getElementsByTagName("td")[y].className==''){
+								pos.unshift([x,y]);//这是更新坐标
+								pos.pop();//删除原有坐标
+							}else{
+								obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+								alert('Game Over');
+								clearInterval(move);
+							}
+							for(i=0;i<pos.length;i++){//循环snake的身体 位置
+								if(i==0){
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i][0]-1].getElementsByTagName("td")[pos[i][1]].className='header';
+								}else{
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									//移动每个snake的身体，本身的下一个位置就是本身的上一个（也就是数组的前一个）位置
+									obj.getElementsByTagName("tr")[pos[i-1][0]].getElementsByTagName("td")[pos[i-1][1]].className='snake';
+								}
+								
+							 }
+						}else{
+							obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+							alert('Game Over');
+							clearInterval(move);
+						}
+						return;
+					}else if(direction==1){
+						obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='';
+						if(y<9){
+							if(obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y+1].className=='food'){
+							pos.unshift([x,y]);
+							creatSnake(0);
+							}else if(obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y+1].className==''){
+								pos.unshift([x,y]);
+								pos.pop();
+							}else{
+								obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+								alert('Game Over');
+								clearInterval(move);
+							}
+							for(i=0;i<pos.length;i++){
+								if(i==0){
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]+1].className='header';
+								}else{
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i-1][0]].getElementsByTagName("td")[pos[i-1][1]].className='snake';
+								}
+								
+							 }
+							
+						}else{
+							obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+							alert('Game Over');
+							clearInterval(move);
+						}
+						return;
+					}else if(direction==2){
+						obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='';
+						if(x<9){
+							if(obj.getElementsByTagName("tr")[x+1].getElementsByTagName("td")[y].className=='food'){
+							pos.unshift([x,y]);
+							creatSnake(0);
+							}else  if(obj.getElementsByTagName("tr")[x+1].getElementsByTagName("td")[y].className==''){
+								pos.unshift([x,y]);
+								pos.pop();
+							}else{
+								obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+								alert('Game Over');
+								clearInterval(move);
+							}
+							for(i=0;i<pos.length;i++){
+								if(i==0){
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i][0]+1].getElementsByTagName("td")[pos[i][1]].className='header';
+								}else{
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i-1][0]].getElementsByTagName("td")[pos[i-1][1]].className='snake';
+								}
+								
+							 }
+						}else{
+							obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+							alert('Game Over');
+							clearInterval(move);
+						}
+						return;
+					}else if(direction==3){
+						obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='';
+						if(y>=1){
+							if(obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y-1].className=='food'){
+							pos.unshift([x,y]);
+							creatSnake(0);
+							}else if(obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y-1].className==''){
+								pos.unshift([x,y]);
+								pos.pop();
+							}else{
+								obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+								alert('Game Over');
+								clearInterval(move);
+							}
+							for(i=0;i<pos.length;i++){
+								if(i==0){
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]-1].className='header';
+								}else{
+									obj.getElementsByTagName("tr")[pos[i][0]].getElementsByTagName("td")[pos[i][1]].className='';
+									obj.getElementsByTagName("tr")[pos[i-1][0]].getElementsByTagName("td")[pos[i-1][1]].className='snake';
+								}
+								
+							 }
+						}else{
+							obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+							alert('Game Over');
+							clearInterval(move);
+						}
+						return;
+					}
+
+					console.log(pos);
+				}
+			}
+		}
+	}
+	creatTable();
+	creatSnake(1);
+	creatSnake(0);
+	var move = setInterval(function(){moveSnake(2)},500);
+
+	//键盘事件(有个BUG,如果document失去焦点的话就不能有键盘事件??)
+	document.onkeydown=function(e){
+		var e = e||window.event;
+		if(e.keyCode==37){
+			 clearInterval(move);
+			 move = setInterval(function(){moveSnake(3)},500);
+		}else if(e.keyCode==38){
+			 clearInterval(move);
+			 move = setInterval(function(){moveSnake(0)},500);
+		}else if(e.keyCode==39){
+			 clearInterval(move);
+			 move = setInterval(function(){moveSnake(1)},500);
+		}else if(e.keyCode==40){
+			 clearInterval(move);
+			 move = setInterval(function(){moveSnake(2)},500);
+		}
+	}
+
+	//利用两个晚上自己思考书写思路，但是明显感觉代码冗长了，主要是为了记录下当时写的思路
+	//利用函数的思想做完了这个项目，后期工作就是利用类的思想重新梳理哈思想
+	// 2016-8-12 0:28
+	
+</script>
+</html>
