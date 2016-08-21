@@ -6,13 +6,162 @@
 </head>
 <style>
 	*{margin:0;padding: 0;}
-	table td{width: 50px; height: 50px; background: #}
-	table td.white{background: white;}
-	table td.black{background: black;}
+	table{background: transparent url(images/bg.jpg) no-repeat -25px -25px; background-size: 100%; }
+	table td{width: 50px; height: 50px;}
+	table td.white{background: transparent url(images/white.png) no-repeat center center; background-size: 100%;}
+	table td.black{background: transparent url(images/black.png) no-repeat center center; background-size: 100%;}
 </style>
 <body>
 </body>
 <script>
-//
+//声明类
+function goBang(){
+	this.at='black';
+	this.winer='';
+	this.gameOver=false;
+}
 
+//定义原型函数
+goBang.prototype={
+	//初始化
+	init:function(){
+		this.creatTable();
+		this.play();
+	},
+	//创建table
+	creatTable:function(){
+		var h='';
+		for(var i=0;i<15;i++){
+			h+='<tr>'
+			for(var j=0;j<15;j++){
+				h+='<td></td>'
+			}
+			h+='</tr>'
+		}
+		document.getElementsByTagName('body')[0].innerHTML='<table border="0" cellspacing="0" cellpadding="0">'+h+'</table>';
+	},
+	//下棋
+	play:function(){
+		var table=document.getElementsByTagName("table")[0];
+		var td   =document.getElementsByTagName("td");
+		var that =this;
+		table.onclick=function(e){
+			e=e||window.event;
+			var i = parseInt(e.clientX/50);
+			var j = parseInt(e.clientY/50);
+			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className!=''){
+				alert("此处已有棋子！");
+				return;
+			}
+			if(that.gameOver){
+				alert("此游戏已结束（"+that.winer+"胜）！请刷新重新下！");
+				return;
+			}
+			if(that.at=='black'){
+				table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className="white";
+				that.at="white";
+				that.isWin(table,i,j);
+			}else{
+				table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className="black";
+				that.at="black";
+				that.isWin(table,i,j);
+			}
+			
+		}
+	},
+	//判断输赢
+	isWin:function(table,i,j){
+		var win = 0;
+		//判断横行
+		for(x=(i-5<0?0:i-5);x<(i+5>15?14:i+5);x++){
+			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[j].getElementsByTagName("td")[x].className){
+				win++;
+				if(win==5){
+					if(this.at=='black'){
+						alert("黑棋胜！");
+						this.winer="黑";
+						this.gameOver=true;
+						return;
+					}else{
+						alert("白棋胜！");
+						this.winer="白";
+						this.gameOver=true;
+						return;
+					}
+				}else{
+				win=0;
+			}
+		}
+	}
+
+		//判断纵行
+		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
+			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
+				win++;
+				if(win==5){
+					if(this.at=='black'){
+						alert("黑棋胜！");
+						this.winer="黑";
+						this.gameOver=true;
+						return;
+					}else{
+						alert("白棋胜！");
+						this.winer="白";
+						this.gameOver=true;
+						return;
+					}
+				}else{
+					win=0;
+				}
+		}
+	}
+
+		//判断正斜行
+		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
+			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
+				win++;
+				if(win==5){
+					if(this.at=='black'){
+						alert("黑棋胜！");
+						this.winer="黑";
+						this.gameOver=true;
+						return;
+					}else{
+						alert("白棋胜！");
+						this.winer="白";
+						this.gameOver=true;
+						return;
+					}
+				}else{
+					win=0;
+				}
+		}
+	}
+
+		//判断反斜行
+		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
+			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
+				win++;
+				if(win==5){
+					if(this.at=='black'){
+						alert("黑棋胜！");
+						this.winer="黑";
+						this.gameOver=true;
+						return;
+					}else{
+						alert("白棋胜！");
+						this.winer="白";
+						this.gameOver=true;
+						return;
+					}
+				}else{
+					win=0;
+				}
+		}
+	}
+		
+	}
+}
+
+new goBang().init();
 </script>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>贪吃蛇游戏（最终版本及总结）2016-8-18</title>
+</head>
+<style>
+	*{margin:0;padding: 0;}
+	table td{width: 50px; height: 50px;}
+	table td.header{background: red;}
+	table td.food{background: green;}
+	table td.snake{background: black;}
+</style>
+<body>
+</body>
+<script>
+
+function Snake(){
+	this.pos=[];//存snake身体
+	this.move='';//存计时器
+}
+
+Snake.prototype={
+	//初始化
+	init:function(){
+		var that=this;//这里是关键 如果不用that代替的话会出错，因为函数里面的this在这里就不在指向该对象了而是window
+		that.creatTable();
+		that.creatSnake(1);
+		that.creatSnake(0);
+		that.move = setInterval(function(){
+			that.moveSnake(2)//比如这里的this 指向的是window
+		},500);
+		//键盘事件(有个BUG,如果document失去焦点的话就不能有键盘事件??)
+		document.onkeydown=function(e){
+			var e = e||window.event;
+			if(e.keyCode==37){
+				 clearInterval(that.move);
+				 that.move = setInterval(function(){that.moveSnake(3)},500);
+			}else if(e.keyCode==38){
+				 clearInterval(that.move);
+				 that.move = setInterval(function(){that.moveSnake(0)},500);
+			}else if(e.keyCode==39){
+				 clearInterval(that.move);
+				 that.move = setInterval(function(){that.moveSnake(1)},500);
+			}else if(e.keyCode==40){
+				 clearInterval(that.move);
+				 that.move = setInterval(function(){that.moveSnake(2)},500);
+			}
+		}
+	},
+	//创建table
+	creatTable:function(){
+		var h='';
+		for(var i=0;i<10;i++){
+			h+='<tr>'
+			for(var j=0;j<10;j++){
+				h+='<td></td>'
+			}
+			h+='</tr>'
+		}
+		document.getElementsByTagName('body')[0].innerHTML='<table border="1" cellspacing="0" cellpadding="0">'+h+'</table>';
+	  },
+	  //创建食物/头部
+	  //@param type[0食物 1头]
+	 creatSnake:function(type){
+	 	var x   = parseInt(Math.random()*10);
+		var y   = parseInt(Math.random()*10);
+		var obj = document.getElementsByTagName('table')[0];
+		if(!obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className){
+			if(type){
+				obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+				this.pos.push([x,y]);
+				this.pos.push([x,y]);//为了防止数组只有两个的情况（因为要清除最后一个的样式）
+			}else{
+				obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='food';
+			}
+		}else{
+			this.creatSnake(type);
+		}
+	 },
+	 //移动snake
+	 //@param direction[0上 1右 2下 3左]
+	 moveSnake:function(direction){
+	 	var obj = document.getElementsByTagName('table')[0];
+	 	var x=this.pos[0][0];
+	 	var y=this.pos[0][1];
+	 	var dis=[[-1,0],[0,1],[1,0],[0,-1]];//定义通用的方向数组（看不懂结合初始化版本看）
+	 	
+ 		obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='';
+		if(((x+dis[direction][0])>=0 && (x+dis[direction][0])<=9)&&((y+dis[direction][1])>=0&&(y+dis[direction][1])<=9)){
+			if(obj.getElementsByTagName("tr")[x+dis[direction][0]].getElementsByTagName("td")[y+dis[direction][1]].className=='food'){
+			this.pos.unshift([x+dis[direction][0],y+dis[direction][1]]);//如果是食物，则向开头加个坐标
+			this.creatSnake(0);//再次创建食物
+			}else if(obj.getElementsByTagName("tr")[x+dis[direction][0]].getElementsByTagName("td")[y+dis[direction][1]].className==''){
+				this.pos.unshift([x+dis[direction][0],y+dis[direction][1]]);//这是更新坐标
+				this.pos.pop();//删除原有坐标
+			}else{
+				obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+				alert('Game Over');
+				clearInterval(this.move);
+			}
+			for(i=0;i<this.pos.length;i++){//循环snake的身体 位置
+				if(i==0){
+					//obj.getElementsByTagName("tr")[this.pos[i][0]-dis[direction][0]].getElementsByTagName("td")[this.pos[i][1]-dis[direction][1]].className='';
+					obj.getElementsByTagName("tr")[this.pos[i][0]].getElementsByTagName("td")[this.pos[i][1]].className='header';
+				}else{
+					//移动每个snake的身体，本身的下一个位置就是本身的上一个（也就是数组的前一个）位置
+					obj.getElementsByTagName("tr")[this.pos[i][0]].getElementsByTagName("td")[this.pos[i][1]].className='snake';
+					//最后一个清除样式（但是当只有两个时会出问题？）
+					if(i==this.pos.length-1){
+						obj.getElementsByTagName("tr")[this.pos[i][0]].getElementsByTagName("td")[this.pos[i][1]].className='';
+					}
+				}
+				
+			 }
+		}else{
+			obj.getElementsByTagName("tr")[x].getElementsByTagName("td")[y].className='header';
+			alert('Game Over');
+			clearInterval(this.move);
+		}
+	 }
+}
+
+new Snake().init();
+
+/*
+总结：
+1、我将原来的代码认真的梳理了一遍，逻辑是有了，但是是最基础的逻辑（代码多，有点乱，但是我觉得思路还算清晰吧）。
+2、我在这个版本中利用面向对象的思想定义一个Snake类，通过它来完成我的功能，好处显而易见，代码清楚、思路清晰。
+3、这个版本中和我第一个版本不一样的还有就是moveSnake函数，上一个版本中代码多，但是思路清晰不饶，比较清楚，适合刚学的人，这个版本中可能就不是很好理解（因为很多东西都集成了）。
+4、那个方向数组其实就是将四个方向的操作的总结。
+5、还有就是之前的版本在pos中第一个存的不是最新的头，第二个版本才是，这也导致我循环snake位置时一个Bug,因为我判断他是最后一个的话就清空样式，但是如果pos里面就只有两个位置，那么吃了一个食物的时候就还是只有一个头部？解决办法就是生成头的时候多push一个进去，这样snake第一次循环时pos就有三个值了。
+ */
+</script>
+</html>
