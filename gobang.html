@@ -60,108 +60,69 @@ goBang.prototype={
 			if(that.at=='black'){
 				table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className="white";
 				that.at="white";
-				that.isWin(table,i,j);
 			}else{
 				table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className="black";
 				that.at="black";
-				that.isWin(table,i,j);
+				
 			}
-			
+			that.isWin(i,j);
 		}
 	},
 	//判断输赢
-	isWin:function(table,i,j){
-		var win = 0;
-		//判断横行
-		for(x=(i-5<0?0:i-5);x<(i+5>15?14:i+5);x++){
-			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[j].getElementsByTagName("td")[x].className){
-				win++;
-				if(win==5){
-					if(this.at=='black'){
-						alert("黑棋胜！");
-						this.winer="黑";
-						this.gameOver=true;
-						return;
-					}else{
-						alert("白棋胜！");
-						this.winer="白";
-						this.gameOver=true;
-						return;
-					}
-				}else{
-				win=0;
+	isWin:function(i,j){
+		var tds=document.getElementsByTagName("td");
+		var winLine=[[],[],[],[]],color='0';
+		for(t=0;t<tds.length;t++){
+			if(tds[t].className=='black'){
+				color='b';
+			}else if(tds[t].className=='white'){
+				color='w';
+			}else{
+				color='0';
 			}
+			//横行
+			if(j==tds[t].parentNode.rowIndex){
+				winLine[0]+=color;
+			}
+			//纵向
+			if(i==tds[t].cellIndex){
+				winLine[1]+=color;
+			}
+			//正斜
+			if((i+j)==(tds[t].cellIndex+tds[t].parentNode.rowIndex)){
+				winLine[2]+=color;
+			}
+			//反斜
+			if((i-tds[t].cellIndex)==(j-tds[t].parentNode.rowIndex)){
+				winLine[3]+=color;
+			}
+			
 		}
-	}
 
-		//判断纵行
-		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
-			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
-				win++;
-				if(win==5){
-					if(this.at=='black'){
-						alert("黑棋胜！");
-						this.winer="黑";
-						this.gameOver=true;
-						return;
-					}else{
-						alert("白棋胜！");
-						this.winer="白";
-						this.gameOver=true;
-						return;
-					}
-				}else{
-					win=0;
-				}
+		if(winLine[0].indexOf("wwwww")>0||winLine[1].indexOf("wwwww")>0||winLine[2].indexOf("wwwww")>0||winLine[3].indexOf("wwwww")>0){
+			alert("白棋胜！");
+			this.winer="白";
+			this.gameOver=true;
+			return;
+			
 		}
-	}
 
-		//判断正斜行
-		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
-			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
-				win++;
-				if(win==5){
-					if(this.at=='black'){
-						alert("黑棋胜！");
-						this.winer="黑";
-						this.gameOver=true;
-						return;
-					}else{
-						alert("白棋胜！");
-						this.winer="白";
-						this.gameOver=true;
-						return;
-					}
-				}else{
-					win=0;
-				}
+		if(winLine[0].indexOf("bbbbb")>0||winLine[1].indexOf("bbbbb")>0||winLine[2].indexOf("bbbbb")>0||winLine[3].indexOf("bbbbb")>0){
+			alert("黑棋胜！");
+			this.winer="黑";
+			this.gameOver=true;
+			return;
+			
 		}
-	}
 
-		//判断反斜行
-		for(y=(j-5<0?0:j-5);y<(j+5>15?14:j+5);y++){
-			if(table.getElementsByTagName("tr")[j].getElementsByTagName("td")[i].className==table.getElementsByTagName("tr")[y].getElementsByTagName("td")[i].className){
-				win++;
-				if(win==5){
-					if(this.at=='black'){
-						alert("黑棋胜！");
-						this.winer="黑";
-						this.gameOver=true;
-						return;
-					}else{
-						alert("白棋胜！");
-						this.winer="白";
-						this.gameOver=true;
-						return;
-					}
-				}else{
-					win=0;
-				}
-		}
-	}
-		
 	}
 }
 
 new goBang().init();
+
+/*总结：
+	1、我之前写过一次这个游戏，现在写又忘了，当时的胜负判断的方式，这是这个游戏的重点
+	2、判断胜负用的是每次下一步棋都去遍历了整个棋盘，将横、竖、正斜、反斜等四个方向的className进行记录（存在一个二维数组中），然后直接去判断这个数组的四个方向上里面连续的wwwww和bbbbb就可以了。
+	3、上边的思路是有了，但是我觉得这样是不是太不简洁，因为每次下棋都要去遍历整个数组，我想的是根据当前下棋的位置来判断当前位置的横、竖、正斜、反斜等四个方向，来进行判断胜负。（待实验）？？
+*/
 </script>
